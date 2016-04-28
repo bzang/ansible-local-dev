@@ -1,2 +1,4 @@
 ---
-# defaults file for local-dev
+docker_machine_name: dev
+dnsmasq_server_ip: 192.168.99.100
+dev_env_dir: /usr/local/dev-env

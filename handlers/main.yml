@@ -1,2 +1,5 @@
 ---
-# handlers file for local-dev
+- name: restart nfsd
+  command: sudo nfsd restart
+  become: yes
+  become_method: sudo

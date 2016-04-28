@@ -1,0 +1,3 @@
+# Dash Developer Environment Profile
+export PATH=$PATH:{{ dev_environment_path }}/bin
+eval "$(dev machine env)"

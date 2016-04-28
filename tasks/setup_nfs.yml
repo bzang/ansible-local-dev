@@ -1,0 +1,10 @@
+---
+- name: Add NFS share to /etc/exports
+  blockinfile:
+    dest: /etc/exports
+    create: yes
+    marker: "## {mark} Dash Developer Environment - ANSIBLE MANAGED BLOCK ##"
+    content: '/Users 192.168.99.100 -alldirs -mapall=0:80'
+  become: yes
+  become_method: sudo
+  notify: restart nfsd
