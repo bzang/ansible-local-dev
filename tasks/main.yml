@@ -42,9 +42,16 @@
 
   - include: setup_nfs.yml
 
-  - include: update_profile.yml
+  - name: Create bootsync.sh for docker-machine
+    template:
+      src: bootsync.sh
+      dest: {{ dev_env_dir }}/local/docker/bootsync.sh
+      force: yes
 
   - name: Create Docker Machine
-    command: "{{ dev_env_dir }}/bin/dev machine create"
-    args:
-      creates: "~/.docker/machine/machines/{{ docker_machine_name }}/config.json"
+    command: "{{ item }}"
+    with_items:
+      - docker-machine create --driver virtualbox --engine-opt dns={{ dnsmasq_server_ip }} --engine-opt dns=8.8.8.8 --engine-opt dns=8.8.4.4 {{ docker_machine_name }}
+      - docker-machine scp {{ dev_env_dir }}/local/docker/bootsync.sh dev:/tmp/bootsync.sh
+      - docker-machine ssh {{ docker_machine_name }} "sudo mv /tmp/bootsync.sh /var/lib/boot2docker/bootsync.sh"
+    notify: restart docker-machine

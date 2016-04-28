@@ -3,3 +3,6 @@
   command: sudo nfsd restart
   become: yes
   become_method: sudo
+
+- name: restart docker-machine
+  command: docker-machine restart {{ docker_machine_name }}
