@@ -1,0 +1,29 @@
+---
+- name: Create resolver directory
+  file: path=/etc/resolver state=directory mode=0755
+  become: yes
+  become_method: sudo
+
+- name: Create dev resolver file at /etc/resolver/dev
+  template:
+    src: resolver.conf
+    dest: /etc/resolver/dev
+    force: yes
+  become: yes
+  become_method: sudo
+
+- include: setup_nfs.yml
+
+- name: Create bootsync.sh for docker-machine
+  template:
+    src: bootsync.sh
+    dest: {{ dev_env_dir }}/local/docker/bootsync.sh
+    force: yes
+
+- name: Create Docker Machine
+  command: "{{ item }}"
+  with_items:
+    - docker-machine create --driver virtualbox --engine-opt dns={{ dnsmasq_server_ip }} --engine-opt dns=8.8.8.8 --engine-opt dns=8.8.4.4 {{ docker_machine_name }}
+    - docker-machine scp {{ dev_env_dir }}/local/docker/bootsync.sh dev:/tmp/bootsync.sh
+    - docker-machine ssh {{ docker_machine_name }} "sudo mv /tmp/bootsync.sh /var/lib/boot2docker/bootsync.sh"
+  notify: restart docker-machine
